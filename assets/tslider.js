@@ -21,18 +21,26 @@
 			var title = this.slides._map[this.slides.xIndex][this.slides.yIndex];
 			this.router.navigate(title);
 			$.ajax({
-				url: '/bags/tslider_public/tiddlers/' + encodeURIComponent(title) +
+				url: '/bags/tslider_public/tiddlers/' +
+					encodeURIComponent(title) +
 					'?render=1',
 				dataType: 'json',
-				success: this.renderSlide.bind(this)
+				success: this.renderSlide.bind(this),
 			});
 
 		},
 
+		/*
+		 * If we are using the render data, we want to not have the
+		 * containing <div> and remove the stupid <br>s that
+		 * tiddlywiki horks in there.
+		 */
 		renderSlide: function(data) {
+			var content = data.render ? $(data.render).contents().not('br')
+				: data.text;
 			$('h1').first().html(data.title);
 			$('title').html(data.title);
-			this.el.empty().html(data.render ? data.render : data.text);
+			this.el.empty().html(content);
 			$('#counter').html((this.slides.xIndex + 1) + '.' +
 				(this.slides.yIndex + 1) +
 				'/' + this.slides._map.length + '.' +
@@ -238,15 +246,13 @@
 			divisor = 2,
 			listWidth = 100;
 
-		$('#slide li').css('font-size', height/18.75);
+		$('#slide').css('font-size', height/18.75);
 		if (!ulWidth) {
 			replace = false;
-			ulWidth = $('#slide ul').width();
+			ulWidth = $('#slide > dl, #slide > ol, #slide > ul').first().width();
 		}
-		console.log('ulWidth', ulWidth);
 
-		if ($('#slide ul ~ img')[0]) {
-			console.log('found img');
+		if ($('#slide > dl ~ img, #slide > ul ~ img, #slide > ol ~ img')[0]) {
 			divisor = 4;
 			listWidth = 50;
 			left = 25;

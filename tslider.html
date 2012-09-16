@@ -40,8 +40,10 @@
 h1 { font-size: {{height1}}px; }
 h2 { font-size: {{height2}}px; }
 h3 { font-size: {{height3}}px; }
-#slide li { font-size: {{height4}}px; }
-#slide ul {
+#slide { font-size: {{height4}}px; }
+#slide > dl,
+#slide > ol,
+#slide > ul {
     position: absolute;
     left: {{left}}%;
     margin-left: {{halfWidth}}px;

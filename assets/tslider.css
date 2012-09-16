@@ -24,14 +24,21 @@ h1,h2,h3 {
 	margin-top: 0;
 }
 
-ul {
+#slide > dl,
+#slide > ol,
+#slide > ul {
 	display: inline-block;
 	margin-left: 0;
 	padding-left: 0;
+        margin-top: 0;
+}
+
+#slide > img {
+    margin-top: 0;
 }
 
 body {
-	padding: 1em;
+	padding: 0 2em 2em 2em;
 }
 
 #slide {
