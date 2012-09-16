@@ -51,10 +51,33 @@
 		 * If we are using the render data, we want to not have the
 		 * containing <div> and remove the stupid <br>s that
 		 * tiddlywiki horks in there.
+		 *
+		 * Anything after the first <hr> is ignored, allowing for
+		 * notes.
 		 */
 		renderSlide: function(data) {
-			var content = data.render ? $(data.render).contents().not('br')
-				: data.text;
+			var render = data.render,
+				content,
+				info,
+				notes;
+			console.log(render);
+			if (render) {
+				var foundHr = false;
+				render = $(render);
+				content = render.children().filter(function() {
+					console.log('cthis', this);
+					if (foundHr) { return false }
+					if ($(this).is('br')) { return false }
+					if ($(this).is('hr')) {
+						foundHr = true;
+						return false;
+					}
+					return true;
+				});
+			} else {
+				content = data.text;
+			}
+
 			$('h1').first().html(data.title);
 			$('title').html(data.title);
 			this.el.empty().html(content);
