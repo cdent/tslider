@@ -1,4 +1,5 @@
 
+// XXX: need screen divisor from static
 (function() {
 
 	"use strict";
@@ -6,9 +7,20 @@
 	$(window).on('resize', cssCleanup);
 	var source = $('#stylesheet-template').html(),
 		styleSheetTemplate = Handlebars.compile(source),
-		ulWidth;
+		ulWidth,
+		root = this,
+		Router,
+		SlideView,
+		SlideMap,
+		router,
+		view,
+		slides;
 
-	var SlideView = function(hostEl, slides, router) {
+	/*
+	 * A View (like but not the same a Backbone view) 
+	 * representing a slide.
+	 */
+	SlideView = function(hostEl, slides, router) {
 		this.el = hostEl;
 		this.slides = slides;
 		this.router = router;
@@ -17,6 +29,10 @@
 
 	_.extend(SlideView.prototype, {
 
+		/*
+		 * Given our position in the map, load that slide,
+		 * render upon success.
+		 */
 		moveSlide: function() {
 			var title = this.slides._map[this.slides.xIndex][this.slides.yIndex];
 			this.router.navigate(title);
@@ -25,7 +41,7 @@
 					encodeURIComponent(title) +
 					'?render=1',
 				dataType: 'json',
-				success: this.renderSlide.bind(this),
+				success: this.renderSlide.bind(this)
 			});
 
 		},
@@ -50,7 +66,11 @@
 
 	});
 
-	var SlideMap = function() {
+	/*
+	 * A model for the map of a slide. A 2d array of
+	 * tiddler titles.
+	 */
+	SlideMap = function() {
 		this.xIndex = 0;
 		this.yIndex = 0;
 		this._map = [['']];
@@ -58,6 +78,9 @@
 
 	_.extend(SlideMap.prototype, {
 
+		/*
+		 * Read a data source into the 2d array.
+		 */
 		parse: function(input) {
 			var dataLines = input.trim().split(/\n+/),
 				x = 0,
@@ -74,15 +97,61 @@
 			});
 		},
 
+		/*
+		 * Announce that the current slide has changed.
+		 */
 		trigger: function() {
 			$("body").trigger('slideUpdate');
 		},
 
+		/*
+		 * Load TSliders as a datasource listing slides.
+		 * On success parseSlides.
+		 */
+		load: function(url) {
+			$.ajax({
+				url: url,
+				dataType: 'json',
+				success: this.parseSlides.bind(this)
+			});
+		},
+
+		/*
+		 * Read data to extract slide information and
+		 * set the map. `this` is a bound SlideMap.
+		 */
+		parseSlides: function (data) {
+			this.parse(data.text);
+			var historyStart = Backbone.history.start({
+				root: window.location.pathname
+			});
+
+			if (!historyStart) {
+				this.reset();
+			}
+		},
+
+		/*
+		 * Find the slide in the map and then navigate to it.
+		 * This will cause the model to trigger its view.
+		 */
+		displaySlide: function(router, slide) {
+			this.find(slide);
+			router.navigate(slide);
+		},
+
+		/*
+		 * Take the map back to the first slide.
+		 */
 		reset: function() {
 			this.yIndex = this.xIndex = 0;
 			this.trigger();
 		},
 
+		/*
+		 * Find a slide in the map, by title.
+		 * If not found, reset().
+		 */
 		find: function(title) {
 			var x = 0,
 				y = 0,
@@ -163,88 +232,60 @@
 			if (this.yIndex + 1 < yLimit) {
 				return this.nextY();
 			}
-			
+
 			if (this.xIndex + 1 < xLimit) {
 				return this.nextX();
 			}
 			this.trigger();
 		}
-			
+
 	});
 
-	var root = this,
-		Router;
-
+	/*
+	 * Backbone router keeping track of what slide we are
+	 * on, by title. Enables bookmarking.
+	 */
 	Router = Backbone.Router.extend({
 		routes: {
 			':slide': 'show'
 		}
 	});
 
-	function displaySlide(router, slide) {
-		console.log('slide is', slide, 'EOF');
-		this.find(slide);
-		router.navigate(slide);
-	}
-
-	function parseSlides(data) {
-		this.parse(data.text);
-		var historyStart = Backbone.history.start({
-			root: window.location.pathname
-		});
-
-		if (!historyStart) {
-			this.reset();
-		}
-	}
-		
-
-	function loadSlides(slides) {
-		$.ajax({
-			url: '/bags/tslider_public/tiddlers/TSliders',
-			dataType: 'json',
-			success: parseSlides.bind(slides)
-		});
-	}
-
-	var slides = new SlideMap();
-	var router = new Router();
-	var view = new SlideView($('#slide'), slides, router);
-	var boundDisplay = displaySlide.bind(slides, router);
-
-	router.on('route:show', boundDisplay);
-
+	/*
+	 * Keydown events for navigation.
+	 */
 	$(document).keydown(function(e) {
 		switch(e.which) {
-			case 37: // left
-				slides.prevX();
-				break;
+		case 37: // left
+			slides.prevX();
+			break;
 
-			case 38: // up
-				slides.prevY();
-				break;
+		case 38: // up
+			slides.prevY();
+			break;
 
-			case 39: // right
-				slides.nextX();
-				break;
+		case 39: // right
+			slides.nextX();
+			break;
 
-			case 40: // down
-				slides.nextY();
-				break;
+		case 40: // down
+			slides.nextY();
+			break;
 
-			case 32: // space
-				slides.next();
-				break;
+		case 32: // space
+			slides.next();
+			break;
 
-			case 82: // 'r'
-				slides.reset();
-				break;
+		case 82: // 'r'
+			slides.reset();
+			break;
 
-			case 67: // 'c'
-				cssCleanup(true);
-				break;
+		case 67: // 'c'
+			cssCleanup(true);
+			break;
 
-			default: return;
+		default:
+			return;
 		}
 		e.preventDefault();
 	});
@@ -255,16 +296,15 @@
 	 * an img (in the slide).
 	 */
 	function cssCleanup(replace) {
-		var replace = replace || false,
-			height = $(window).height(),
-			width = $(window).width(),
+		replace = replace || false;
+		var height = $(window).height(),
 			sheet,
 			styleSheetInput,
 			left = 50,
 			divisor = 2,
 			listWidth = 100;
 
-		$('#slide').css('font-size', height/18.75);
+		$('#slide').css('font-size', height / 18.75);
 		if (!ulWidth) {
 			replace = false;
 			ulWidth = $('#slide > dl, #slide > ol, #slide > ul').first().width();
@@ -277,11 +317,11 @@
 		}
 
 		styleSheetInput = styleSheetTemplate({
-			height1: height/10,
-			height2: height/15,
-			height3: height/17.5,
-			height4: height/18.75,
-			halfWidth: (ulWidth/divisor * - 1),
+			height1: height / 10,
+			height2: height / 15,
+			height3: height / 17.5,
+			height4: height / 18.75,
+			halfWidth: (ulWidth / divisor * -1),
 			listWidth: listWidth,
 			left: left
 		});
@@ -300,8 +340,19 @@
 		$('body').append(sheet);
 	}
 
-	loadSlides(slides);
+	/*
+	 * GO!
+	 * Load the slides and navigate to the first one.
+	 */
+	slides = new SlideMap();
+	router = new Router();
+	view = new SlideView($('#slide'), slides, router);
+	router.on('route:show', slides.displaySlide.bind(slides, router));
+	slides.load('/bags/tslider_public/tiddlers/TSliders');
 
+	/*
+	 * For debugging, export slides to global.
+	 */
 	root.slides = slides;
 
 }).call(this);
