@@ -187,9 +187,27 @@
 		router.navigate(slide);
 	}
 
+	function parseSlides(data) {
+		this.parse(data.text);
+		var historyStart = Backbone.history.start({
+			root: window.location.pathname
+		});
+
+		if (!historyStart) {
+			this.reset();
+		}
+	}
+		
+
+	function loadSlides(slides) {
+		$.ajax({
+			url: '/bags/tslider_public/tiddlers/TSliders',
+			dataType: 'json',
+			success: parseSlides.bind(slides)
+		});
+	}
+
 	var slides = new SlideMap();
-	// replace with getting the right tiddler
-	slides.parse("hello,fat,slow,moody\ngoodbye,monkey\nfart,chance,luck");
 	var router = new Router();
 	var view = new SlideView($('#slide'), slides, router);
 	var boundDisplay = displaySlide.bind(slides, router);
@@ -282,14 +300,7 @@
 		$('body').append(sheet);
 	}
 
-
-	var historyStart = Backbone.history.start({
-		root: window.location.pathname
-	});
-
-	if (!historyStart) {
-		slides.reset();
-	}
+	loadSlides(slides);
 
 	root.slides = slides;
 
