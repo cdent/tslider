@@ -7,6 +7,7 @@
 	$(window).on('resize', cssCleanup);
 	var source = $('#stylesheet-template').html(),
 		styleSheetTemplate = Handlebars.compile(source),
+		screenDivisor = 10,
 		ulWidth,
 		root = this,
 		Router,
@@ -317,10 +318,10 @@
 		}
 
 		styleSheetInput = styleSheetTemplate({
-			height1: height / 10,
-			height2: height / 15,
-			height3: height / 17.5,
-			height4: height / 18.75,
+			height1: height / screenDivisor,
+			height2: height / screenDivisor * 1.5,
+			height3: height / screenDivisor * 1.75,
+			height4: height / screenDivisor * 1.875,
 			halfWidth: (ulWidth / divisor * -1),
 			listWidth: listWidth,
 			left: left
