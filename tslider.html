@@ -6,19 +6,51 @@
             rel="stylesheet"
             type="text/css"
             href="/bags/common/tiddlers/normalize.css" />
+        <link
+            rel="stylesheet"
+            type="text/css"
+            href="/bags/tslider_public/tiddlers/tslider.css" />
     </head>
     <body>
         <h1>Stub</h1>
-		<div id="slide"></div>
+
+        <div id="slide">
+        <ul>
+            <li>Be good</li>
+            <li>Travel Hard</li>
+            <li>Smile!</li>
+        </ul>
+            <img
+            src="http://farm1.staticflickr.com/142/366831282_730a39b455_b.jpg"
+            >
+
+        </div>
+        <div id="counter"></div>
 
         <script src="/bags/common/tiddlers/jquery.js"></script>
         <script src="/bags/tslider_public/tiddlers/underscore.js"></script>
         <script src="/bags/tslider_public/tiddlers/backbone.js"></script>
         <script src="/bags/tslider_public/tiddlers/handlebars.js"></script>
 <script id="slide-template" type="text/x-handlebars-template">
-<div class="slide">
+<div id="slide">
 {{{content}}}
 </div>
+</script>
+<script id="stylesheet-template" type="text/x-handlebars-template">
+h1 { font-size: {{height1}}px; }
+h2 { font-size: {{height2}}px; }
+h3 { font-size: {{height3}}px; }
+#slide li { font-size: {{height4}}px; }
+#slide ul {
+    position: absolute;
+    left: 50%;
+    margin-left: {{halfWidth}}px;
+}
+#slide ul ~ img {
+    left: 25%;
+    width: 50%;
+    margin-left: {{quarterWidth}}px;
+}
 </script>
         <script src="/bags/tslider_public/tiddlers/tslider.js"></script>
     </body>

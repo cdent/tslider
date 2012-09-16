@@ -1,0 +1,46 @@
+* {
+	box-sizing: border-box;
+}
+
+html, body {
+	height: 100%;
+}
+
+html {
+	background-image: -webkit-linear-gradient(top, #222222 85%, #ffffff);
+	background-image:    -moz-linear-gradient(top, #222222 85%, #ffffff);
+	background-image:      -o-linear-gradient(top, #222222 85%, #ffffff);
+	background-image:     -ms-linear-gradient(top, #222222 85%, #ffffff);
+	color: #fffacd;
+}
+
+img {
+	float: right;
+	max-width: 45%;
+}
+
+h1,h2,h3 {
+	text-align: center;
+	margin-top: 0;
+}
+
+ul {
+	display: inline-block;
+	margin-left: 0;
+	padding-left: 0;
+}
+
+body {
+	padding: 1em;
+}
+
+#slide {
+	margin: auto;
+}
+
+#counter {
+	position: absolute;
+	left: 1em;
+	bottom: 1em;
+	color: black;
+}
