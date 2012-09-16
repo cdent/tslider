@@ -5,7 +5,8 @@
 
 	$(window).on('resize', cssCleanup);
 	var source = $('#stylesheet-template').html(),
-		styleSheetTemplate = Handlebars.compile(source);
+		styleSheetTemplate = Handlebars.compile(source),
+		ulWidth;
 
 	var SlideView = function(hostEl, slides, router) {
 		this.el = hostEl;
@@ -18,17 +19,27 @@
 
 		moveSlide: function() {
 			var title = this.slides._map[this.slides.xIndex][this.slides.yIndex];
-			console.log('map updated', this.slides.xIndex, this.slides.yIndex,
-				title);
 			this.router.navigate(title);
-			$('h1').first().html(title);
-			this.el.empty().html('<ul><li>' + title + '</li></ul>');
+			$.ajax({
+				url: '/bags/tslider_public/tiddlers/' + encodeURIComponent(title) +
+					'?render=1',
+				dataType: 'json',
+				success: this.renderSlide.bind(this)
+			});
+
+		},
+
+		renderSlide: function(data) {
+			$('h1').first().html(data.title);
+			$('title').html(data.title);
+			this.el.empty().html(data.render ? data.render : data.text);
 			$('#counter').html((this.slides.xIndex + 1) + '.' +
 				(this.slides.yIndex + 1) +
 				'/' + this.slides._map.length + '.' +
 				this.slides._map[this.slides.xIndex].length);
 			cssCleanup(true);
 		}
+
 	});
 
 	var SlideMap = function() {
@@ -71,7 +82,6 @@
 			_.every(this._map, function(xBit, xIndex) {
 				var index = xBit.indexOf(title);
 				x = xIndex;
-				console.log('xy', x, y);
 				if (index !== -1) {
 					y = index;
 					hit = true;
@@ -224,32 +234,46 @@
 			width = $(window).width(),
 			sheet,
 			styleSheetInput,
-			ulWidth;
+			left = 50,
+			divisor = 2,
+			listWidth = 100;
 
 		$('#slide li').css('font-size', height/18.75);
-		ulWidth = $('#slide ul').width();
+		if (!ulWidth) {
+			replace = false;
+			ulWidth = $('#slide ul').width();
+		}
+		console.log('ulWidth', ulWidth);
+
+		if ($('#slide ul ~ img')[0]) {
+			console.log('found img');
+			divisor = 4;
+			listWidth = 50;
+			left = 25;
+		}
 
 		styleSheetInput = styleSheetTemplate({
 			height1: height/10,
 			height2: height/15,
 			height3: height/17.5,
 			height4: height/18.75,
-			halfWidth: (ulWidth/2 * - 1),
-			quarterWidth: (ulWidth/4 * - 1)
+			halfWidth: (ulWidth/divisor * - 1),
+			listWidth: listWidth,
+			left: left
 		});
 
 		if (replace) {
 			sheet = $('#stylesheet');
-			sheet.empty();
-			sheet.html(styleSheetInput);
+			sheet.remove();
 		} else {
 			sheet = $('<style>').attr({
 				id: 'stylesheet',
-				type: 'text/css'});
-			sheet.html(styleSheetInput);
-			$('body').append(sheet);
+				type: 'text/css'
+			});
 		}
 
+		sheet.html(styleSheetInput);
+		$('body').append(sheet);
 	}
 
 
@@ -261,7 +285,6 @@
 		slides.reset();
 	}
 
-	cssCleanup();
 	root.slides = slides;
 
 }).call(this);
