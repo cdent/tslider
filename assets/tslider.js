@@ -7,7 +7,7 @@
 	$(window).on('resize', cssCleanup);
 	var source = $('#stylesheet-template').html(),
 		styleSheetTemplate = Handlebars.compile(source),
-		screenDivisor = 10,
+		screenDivisor = 8,
 		ulWidth,
 		root = this,
 		Router,
@@ -34,7 +34,8 @@
 		 * Given our position in the map, load that slide,
 		 * render upon success.
 		 */
-		moveSlide: function() {
+		moveSlide: function(ev, notes) {
+			notes = notes || false;
 			var title = this.slides._map[this.slides.xIndex][this.slides.yIndex];
 			this.router.navigate(title);
 			$.ajax({
@@ -42,7 +43,7 @@
 					encodeURIComponent(title) +
 					'?render=1',
 				dataType: 'json',
-				success: this.renderSlide.bind(this)
+				success: this.renderSlide.bind(this, notes)
 			});
 
 		},
@@ -55,24 +56,27 @@
 		 * Anything after the first <hr> is ignored, allowing for
 		 * notes.
 		 */
-		renderSlide: function(data) {
+		renderSlide: function(showNotes, data) {
 			var render = data.render,
 				content,
 				info,
 				notes;
-			console.log(render);
 			if (render) {
 				var foundHr = false;
 				render = $(render);
-				content = render.children().filter(function() {
-					console.log('cthis', this);
-					if (foundHr) { return false }
+				content = render.contents().filter(function() {
+					if (showNotes && foundHr) { return true; }
+					if (foundHr) { return false; }
 					if ($(this).is('br')) { return false }
 					if ($(this).is('hr')) {
 						foundHr = true;
 						return false;
 					}
-					return true;
+					if (showNotes) {
+						return false;
+					} else {
+						return true;
+					}
 				});
 			} else {
 				content = data.text;
@@ -85,7 +89,7 @@
 				(this.slides.yIndex + 1) +
 				'/' + this.slides._map.length + '.' +
 				this.slides._map[this.slides.xIndex].length);
-			cssCleanup(true);
+			cssCleanup(true, showNotes);
 		}
 
 	});
@@ -124,8 +128,8 @@
 		/*
 		 * Announce that the current slide has changed.
 		 */
-		trigger: function() {
-			$("body").trigger('slideUpdate');
+		trigger: function(notes) {
+			$("body").trigger('slideUpdate', [notes]);
 		},
 
 		/*
@@ -160,6 +164,7 @@
 		 * This will cause the model to trigger its view.
 		 */
 		displaySlide: function(router, slide) {
+			slide = decodeURIComponent(slide);
 			this.find(slide);
 			router.navigate(slide);
 		},
@@ -312,6 +317,14 @@
 			toggleHelp();
 			break;
 
+		case 78: // 'n'
+			slides.trigger(true);
+			break;
+
+		case 68: // 'd'
+			slides.trigger(false);
+			break;
+
 		default:
 			return;
 		}
@@ -335,8 +348,9 @@
 	 * Reset list position based on the prensence of
 	 * an img (in the slide).
 	 */
-	function cssCleanup(replace) {
+	function cssCleanup(replace, showNotes) {
 		replace = replace || false;
+		showNotes = showNotes || false;
 		var height = $(window).height(),
 			sheet,
 			styleSheetInput,
@@ -355,12 +369,15 @@
 			listWidth = 50;
 			left = 25;
 		}
+		$('#slide').css('font-size', '');
+
+		var fourDiv = 1.825 * (showNotes ? 2 : 1);
 
 		styleSheetInput = styleSheetTemplate({
 			height1: height / screenDivisor,
-			height2: height / screenDivisor * 1.5,
-			height3: height / screenDivisor * 1.75,
-			height4: height / screenDivisor * 1.875,
+			height2: height / (screenDivisor * 1.5),
+			height3: height / (screenDivisor * 1.75),
+			height4: height / (screenDivisor * fourDiv),
 			halfWidth: (ulWidth / divisor * -1),
 			listWidth: listWidth,
 			left: left
