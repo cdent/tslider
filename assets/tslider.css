@@ -74,9 +74,19 @@ body {
 #helppage.on {
     display: block;
     position: absolute;
+    background: #111111;
     left: 1em;
     top: 1em;
     border-radius: 5px;
     border: thin solid white;
     padding: 0 1em 0 1em;
+}
+
+a {
+    color: white;
+    text-decoration: underline;
+}
+
+a:visited {
+    text-decoration: none;
 }
