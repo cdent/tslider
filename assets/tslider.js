@@ -308,11 +308,27 @@
 			cssCleanup(true);
 			break;
 
+		case 72: // 'h'
+			toggleHelp();
+			break;
+
 		default:
 			return;
 		}
 		e.preventDefault();
 	});
+
+	// set up click on helppage
+	$('#helppage').on('click', function() {
+		$(this).removeClass('on');
+	});
+
+	/*
+	 * Turn the help on.
+	 */
+	function toggleHelp() {
+		$('#helppage').toggleClass('on');
+	}
 
 	/*
 	 * Reset font sizes based on window size.
