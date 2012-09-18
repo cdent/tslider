@@ -36,6 +36,7 @@
             </dl>
         </div>
         <script src="/bags/common/tiddlers/jquery.js"></script>
+        <script src="/status.js"></script>
         <script src="/bags/tslider_public/tiddlers/underscore.js"></script>
         <script src="/bags/tslider_public/tiddlers/backbone.js"></script>
         <script src="/bags/tslider_public/tiddlers/handlebars.js"></script>
@@ -61,7 +62,7 @@ var slides = new SlideMap(),
 	router = new Router(),
 	view = new SlideView($('#slide'), slides, router);
 router.on('route:show', slides.displaySlide.bind(slides, router));
-slides.load('/bags/tslider_public/tiddlers/TSliders');
+slides.load('/bags/' + tiddlyweb.status.space.name + '_public/tiddlers/TSliders');
 </script>
     </body>
 </html>

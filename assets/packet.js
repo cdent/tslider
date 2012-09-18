@@ -3,7 +3,7 @@
  */
 
 $(function() {
-var bag = '/bags/tslider_public/tiddlers',
+var bag = '/bags/' + tiddlyweb.status.space.name + '_public/tiddlers',
 	currentSlide = '',
 	slides = new SlideMap();
 	source = $('#slide-template').html(),
