@@ -59,10 +59,12 @@ h3 { font-size: {{height3}}px; }
         <script src="/bags/tslider_public/tiddlers/tslider.js"></script>
 		<script>
 var slides = new SlideMap(),
+	tiddlyweb = tiddlyweb || {},
+	bag = tiddlyweb.status ? tiddlyweb.status.space.name : 'tslider_public',
 	router = new Router(),
 	view = new SlideView($('#slide'), slides, router);
 router.on('route:show', slides.displaySlide.bind(slides, router));
-slides.load('/bags/' + tiddlyweb.status.space.name + '_public/tiddlers/TSliders');
+slides.load('/bags/' + bag + '_public/tiddlers/TSliders');
 </script>
     </body>
 </html>

@@ -10,6 +10,7 @@
 		screenDivisor = 8,
 		root = this,
 		Router,
+		onLine = navigator.onLine,
 		SlideView,
 		SlideMap;
 
@@ -35,14 +36,20 @@
 			notes = notes || false;
 			var title = this.slides._map[this.slides.xIndex][this.slides.yIndex];
 			this.router.navigate(title);
-			$.ajax({
-				url: '/bags/tslider_public/tiddlers/' +
-					encodeURIComponent(title) +
-					'?render=1',
-				dataType: 'json',
-				success: this.renderSlide.bind(this, notes)
-			});
-
+			if (onLine) {
+				$.ajax({
+					url: this.slides.baseURL + '/' +
+						encodeURIComponent(title) +
+						'?render=1',
+					dataType: 'json',
+					success: this.renderSlide.bind(this, notes)
+				});
+			} else {
+				var data = localStorage['tslider.' + title];
+				if (data) {
+					this.renderSlide(notes, JSON.parse(data));
+				}
+			}
 		},
 
 		/*
@@ -85,6 +92,9 @@
 				'/' + this.slides._map.length + '.' +
 				this.slides._map[this.slides.xIndex].length);
 			cssCleanup(showNotes);
+			if (onLine) {
+				localStorage['tslider.' + data.title] = JSON.stringify(data);
+			}
 		}
 
 	});
@@ -97,6 +107,7 @@
 		this.xIndex = 0;
 		this.yIndex = 0;
 		this._map = [['']];
+		this.baseURL = '';
 	};
 
 	_.extend(SlideMap.prototype, {
@@ -132,11 +143,20 @@
 		 * On success parseSlides.
 		 */
 		load: function(url) {
-			$.ajax({
-				url: url,
-				dataType: 'json',
-				success: this.parseSlides.bind(this)
-			});
+			this.baseURL = url.replace(/\/[^\/]*$/, '');
+			if (onLine) {
+				$.ajax({
+					url: url,
+					dataType: 'json',
+					success: this.parseSlides.bind(this)
+				});
+			} else {
+				// XXX assumes slides slide is TSliders, even when not
+				var data = localStorage['tslider.TSliders'];
+				if (data) {
+					this.parseSlides(JSON.parse(data));
+				}
+			}
 		},
 
 		/*
@@ -159,6 +179,10 @@
 			} else {
 				this.reset();
 			}
+			if (onLine) {
+				localStorage['tslider.TSliders'] = JSON.stringify(data);
+			}
+
 		},
 
 		/*
