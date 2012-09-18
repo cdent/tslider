@@ -7,10 +7,12 @@ A tsapp for doing presentations. Architecture as follows:
 * Loads up a tiddler which lists the slides, vertical is main slides,
   horizontal is sub slides, as follows:
 
+```
 First
 Second, Second.a, Second.b
 Third
 Fourth, Fourth.a, Fourth.b
+```
 
 * Uses history pushes to change location and indicate current slide.
 * Arrows left and right traverse the main slides, up and down the
