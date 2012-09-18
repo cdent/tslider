@@ -8,7 +8,6 @@
 	var source = $('#stylesheet-template').html(),
 		styleSheetTemplate = Handlebars.compile(source),
 		screenDivisor = 8,
-		ulWidth,
 		root = this,
 		Router,
 		SlideView,
@@ -89,7 +88,7 @@
 				(this.slides.yIndex + 1) +
 				'/' + this.slides._map.length + '.' +
 				this.slides._map[this.slides.xIndex].length);
-			cssCleanup(true, showNotes);
+			cssCleanup(showNotes);
 		}
 
 	});
@@ -310,7 +309,7 @@
 			break;
 
 		case 67: // 'c'
-			cssCleanup(true);
+			cssCleanup();
 			break;
 
 		case 72: // 'h'
@@ -345,33 +344,30 @@
 
 	/*
 	 * Reset font sizes based on window size.
-	 * Reset list position based on the prensence of
+	 * Reset list position based on the presence of
 	 * an img (in the slide).
 	 */
-	function cssCleanup(replace, showNotes) {
-		replace = replace || false;
+	function cssCleanup(showNotes) {
 		showNotes = showNotes || false;
 		var height = $(window).height(),
+			ulWidth,
 			sheet,
 			styleSheetInput,
 			left = 50,
 			divisor = 2,
-			listWidth = 100;
+			listWidth = 0;
 
 		$('#slide').css('font-size', height / 18.75);
-		if (!ulWidth) {
-			replace = false;
-			ulWidth = $('#slide > dl, #slide > ol, #slide > ul').first().width();
-		}
+		ulWidth = $('#slide > dl, #slide > ol, #slide > ul').first().width();
+		$('#slide').css('font-size', '');
 
 		if ($('#slide > dl ~ img, #slide > ul ~ img, #slide > ol ~ img')[0]) {
 			divisor = 4;
 			listWidth = 50;
 			left = 25;
 		}
-		$('#slide').css('font-size', '');
 
-		var fourDiv = 1.825 * (showNotes ? 2 : 1);
+		var fourDiv = 1.875 * (showNotes ? 2 : 1);
 
 		styleSheetInput = styleSheetTemplate({
 			height1: height / screenDivisor,
@@ -383,15 +379,11 @@
 			left: left
 		});
 
-		if (replace) {
-			sheet = $('#stylesheet');
-			sheet.remove();
-		} else {
-			sheet = $('<style>').attr({
+		$('#stylesheet').remove();
+		sheet = $('<style>').attr({
 				id: 'stylesheet',
 				type: 'text/css'
-			});
-		}
+		});
 
 		sheet.html(styleSheetInput);
 		$('body').append(sheet);

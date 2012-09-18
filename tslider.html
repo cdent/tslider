@@ -50,7 +50,9 @@ h3 { font-size: {{height3}}px; }
     position: absolute;
     left: {{left}}%;
     margin-left: {{halfWidth}}px;
-    width: {{listWidth}}%;
+	{{#if listWidth}}
+    width: {{listWidth}}%; 
+	{{/if}}
 }
 </script>
         <script src="/bags/tslider_public/tiddlers/tslider.js"></script>
