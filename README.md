@@ -17,5 +17,5 @@ Fourth, Fourth.a, Fourth.b
   subs. Space goes "next", whatever that might be.
 * Slides can be HTML or something that is rendered to HTML, they are
   retrieved as JSON, render is used if present.
-* Slide notes go in the same tiddler, anything below <hr> is notes
+* Slide notes go in the same tiddler, anything below &lt;hr&gt; is notes
   (assuming this selects okay).
