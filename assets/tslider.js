@@ -142,14 +142,21 @@
 		/*
 		 * Read data to extract slide information and
 		 * set the map. `this` is a bound SlideMap.
+		 *
+		 * If a Router has been established then Backbone.history
+		 * will be available.
 		 */
 		parseSlides: function (data) {
 			this.parse(data.text);
-			var historyStart = Backbone.history.start({
-				root: window.location.pathname
-			});
+			if (Backbone.history) {
+				var historyStart = Backbone.history.start({
+					root: window.location.pathname
+				});
 
-			if (!historyStart) {
+				if (!historyStart) {
+					this.reset();
+				}
+			} else {
 				this.reset();
 			}
 		},

@@ -1,0 +1,10 @@
+
+body {
+	padding: 1em;
+}
+
+.slide {
+	border-left: thin solid black;
+	margin: 1em auto 0 auto;
+	padding: 0 1em 0 1em;
+}
