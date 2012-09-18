@@ -11,10 +11,7 @@
 		root = this,
 		Router,
 		SlideView,
-		SlideMap,
-		router,
-		view,
-		slides;
+		SlideMap;
 
 	/*
 	 * A View (like but not the same a Backbone view) 
@@ -25,6 +22,7 @@
 		this.slides = slides;
 		this.router = router;
 		$(document).on("slideUpdate", this.moveSlide.bind(this));
+		establishEvents(slides);
 	};
 
 	_.extend(SlideView.prototype, {
@@ -57,16 +55,14 @@
 		 */
 		renderSlide: function(showNotes, data) {
 			var render = data.render,
-				content,
-				info,
-				notes;
+				foundHr = false,
+				content;
 			if (render) {
-				var foundHr = false;
 				render = $(render);
 				content = render.contents().filter(function() {
 					if (showNotes && foundHr) { return true; }
 					if (foundHr) { return false; }
-					if ($(this).is('br')) { return false }
+					if ($(this).is('br')) { return false; }
 					if ($(this).is('hr')) {
 						foundHr = true;
 						return false;
@@ -282,53 +278,55 @@
 	/*
 	 * Keydown events for navigation.
 	 */
-	$(document).keydown(function(e) {
-		switch(e.which) {
-		case 37: // left
-			slides.prevX();
-			break;
+	function establishEvents(slides) {
+		$(document).keydown(function(e) {
+			switch(e.which) {
+			case 37: // left
+				slides.prevX();
+				break;
 
-		case 38: // up
-			slides.prevY();
-			break;
+			case 38: // up
+				slides.prevY();
+				break;
 
-		case 39: // right
-			slides.nextX();
-			break;
+			case 39: // right
+				slides.nextX();
+				break;
 
-		case 40: // down
-			slides.nextY();
-			break;
+			case 40: // down
+				slides.nextY();
+				break;
 
-		case 32: // space
-			slides.next();
-			break;
+			case 32: // space
+				slides.next();
+				break;
 
-		case 82: // 'r'
-			slides.reset();
-			break;
+			case 82: // 'r'
+				slides.reset();
+				break;
 
-		case 67: // 'c'
-			cssCleanup();
-			break;
+			case 67: // 'c'
+				cssCleanup();
+				break;
 
-		case 72: // 'h'
-			toggleHelp();
-			break;
+			case 72: // 'h'
+				toggleHelp();
+				break;
 
-		case 78: // 'n'
-			slides.trigger(true);
-			break;
+			case 78: // 'n'
+				slides.trigger(true);
+				break;
 
-		case 68: // 'd'
-			slides.trigger(false);
-			break;
+			case 68: // 'd'
+				slides.trigger(false);
+				break;
 
-		default:
-			return;
-		}
-		e.preventDefault();
-	});
+			default:
+				return;
+			}
+			e.preventDefault();
+		});
+	}
 
 	// set up click on helppage
 	$('#helppage').on('click', function() {
@@ -355,7 +353,8 @@
 			styleSheetInput,
 			left = 50,
 			divisor = 2,
-			listWidth = 0;
+			listWidth = 0,
+			fourDiv = 1.875 * (showNotes ? 2 : 1);
 
 		$('#slide').css('font-size', height / 18.75);
 		ulWidth = $('#slide > dl, #slide > ol, #slide > ul').first().width();
@@ -366,8 +365,6 @@
 			listWidth = 50;
 			left = 25;
 		}
-
-		var fourDiv = 1.875 * (showNotes ? 2 : 1);
 
 		styleSheetInput = styleSheetTemplate({
 			height1: height / screenDivisor,
@@ -381,8 +378,8 @@
 
 		$('#stylesheet').remove();
 		sheet = $('<style>').attr({
-				id: 'stylesheet',
-				type: 'text/css'
+			id: 'stylesheet',
+			type: 'text/css'
 		});
 
 		sheet.html(styleSheetInput);
@@ -390,18 +387,10 @@
 	}
 
 	/*
-	 * GO!
-	 * Load the slides and navigate to the first one.
-	 */
-	slides = new SlideMap();
-	router = new Router();
-	view = new SlideView($('#slide'), slides, router);
-	router.on('route:show', slides.displaySlide.bind(slides, router));
-	slides.load('/bags/tslider_public/tiddlers/TSliders');
-
-	/*
 	 * For debugging, export slides to global.
 	 */
-	root.slides = slides;
+	root.SlideMap = SlideMap;
+	root.Router = Router;
+	root.SlideView = SlideView;
 
 }).call(this);

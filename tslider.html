@@ -56,5 +56,12 @@ h3 { font-size: {{height3}}px; }
 }
 </script>
         <script src="/bags/tslider_public/tiddlers/tslider.js"></script>
+		<script>
+var slides = new SlideMap(),
+	router = new Router(),
+	view = new SlideView($('#slide'), slides, router);
+router.on('route:show', slides.displaySlide.bind(slides, router));
+slides.load('/bags/tslider_public/tiddlers/TSliders');
+</script>
     </body>
 </html>
