@@ -391,7 +391,7 @@
 		ulWidth = $('#slide > dl, #slide > ol, #slide > ul').first().width();
 		$('#slide').css('font-size', '');
 
-		if ($('#slide > dl ~ img, #slide > ul ~ img, #slide > ol ~ img')[0]) {
+		if ($('#slide img')[0]) {
 			divisor = 4;
 			listWidth = 50;
 			left = 25;
