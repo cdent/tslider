@@ -1,7 +1,8 @@
-
 # tslider - The T is Silent
 
-A tsapp for doing presentations. Architecture as follows:
+This abandonware, the [impress.js hack](http://chromatazoa.tiddlyspace.com/) is better.
+
+A [tsapp](http://tsapp.tiddlyspace.com/) for doing presentations. Architecture as follows:
 
 * SPA loads up necessary CSS and JavaScript
 * Loads up a tiddler which lists the slides, vertical is main slides,
